@@ -1,0 +1,3 @@
+part_number,product_type,category_name,description,low_stock_threshold,available_sizes
+PN-001,Safety Goggles,Eye Protection,"Standard safety goggles, anti-fog",10,""
+PN-002,Hard Hat,Head Protection,Yellow hard hat,5,"2,3"

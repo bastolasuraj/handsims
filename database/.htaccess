@@ -1,0 +1,12 @@
+# Deny access to database files
+Order Deny,Allow
+Deny from all
+
+# Prevent directory browsing
+Options -Indexes
+
+# Deny access to SQL files
+<FilesMatch "\.(sql|db|sqlite)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>

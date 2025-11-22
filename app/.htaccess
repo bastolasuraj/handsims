@@ -1,0 +1,12 @@
+# Deny access to application files
+Order Deny,Allow
+Deny from all
+
+# Prevent directory browsing
+Options -Indexes
+
+# Deny access to PHP files
+<FilesMatch "\.php$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>

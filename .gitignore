@@ -1,0 +1,48 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Local configuration
+# config.php and database.php are part of the core application logic and do not contain sensitive data directly.
+# Sensitive configurations are loaded from .env or config.local.php (which is in unnecessaries/).
+
+# Vendor directory
+/vendor/
+
+# Logs
+/logs/*.log
+!/logs/.gitkeep
+
+# Uploads
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# Cache
+.phpunit.result.cache
+/cache/*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.backup
+*.bak
+*.old
+
+# Unnecessary files and directories
+/unnecessaries/
+composer.lock
+schema_refined.sql
+FIXES_APPLIED.txt
+PRODUCTION_READY.txt
+database_fix.md
+git-smart-sync.sh

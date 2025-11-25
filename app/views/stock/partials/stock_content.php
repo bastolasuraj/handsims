@@ -16,7 +16,71 @@
     </div>
 </div>
 
-
+<!-- Summary Statistics -->
+<div class="p-6 bg-gradient-to-r from-blue-50 to-indigo-50">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <?php
+        $totalItems = count($stock);
+        $totalQuantity = array_sum(array_column($stock, 'quantity'));
+        $lowStockCount = count(
+            array_filter(
+                $stock, function ($item) {
+                    return $item['quantity'] <= $item['low_stock_threshold'];
+                }
+            )
+        );
+        $uniqueProducts = count(array_unique(array_column($stock, 'product_id')));
+        ?>
+        
+        <div class="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 uppercase tracking-wider">Total Items</p>
+                    <p class="text-2xl font-bold text-gray-800"><?php echo number_format($totalItems); ?></p>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-lg">
+                    <i class="fas fa-boxes text-blue-600"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 uppercase tracking-wider">Total Quantity</p>
+                    <p class="text-2xl font-bold text-gray-800"><?php echo number_format($totalQuantity); ?></p>
+                </div>
+                <div class="bg-green-100 p-3 rounded-lg">
+                    <i class="fas fa-cubes text-green-600"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 uppercase tracking-wider">Unique Products</p>
+                    <p class="text-2xl font-bold text-gray-800"><?php echo number_format($uniqueProducts); ?></p>
+                </div>
+                <div class="bg-purple-100 p-3 rounded-lg">
+                    <i class="fas fa-tags text-purple-600"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 uppercase tracking-wider">Low Stock</p>
+                    <p class="text-2xl font-bold text-red-600"><?php echo number_format($lowStockCount); ?></p>
+                </div>
+                <div class="bg-red-100 p-3 rounded-lg animate-pulse">
+                    <i class="fas fa-exclamation-triangle text-red-600"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Stock Table -->
 <div class="overflow-x-auto overflow-x-hidden">

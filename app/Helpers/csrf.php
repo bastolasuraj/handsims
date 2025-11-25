@@ -5,6 +5,7 @@
 
 /**
  * Generate or retrieve the current CSRF token
+ *
  * @return string The CSRF token for the current session
  */
 function csrf_token(): string
@@ -17,7 +18,8 @@ function csrf_token(): string
 
 /**
  * Verify a CSRF token against the session token
- * @param string $token The token to verify
+ *
+ * @param  string $token The token to verify
  * @return bool True if valid, false otherwise
  */
 function csrf_verify(string $token): bool
@@ -27,6 +29,7 @@ function csrf_verify(string $token): bool
 
 /**
  * Generate a hidden input field with CSRF token
+ *
  * @return string HTML for hidden CSRF input
  */
 function csrf_field(): string

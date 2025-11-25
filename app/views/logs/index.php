@@ -84,7 +84,7 @@
     </div>
 
     <div id="log-content-area" class="space-y-6">
-        <?php include 'partials/log_content.php'; ?>
+        <?php require 'partials/log_content.php'; ?>
     </div>
 </div>
 

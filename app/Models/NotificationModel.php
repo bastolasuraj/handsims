@@ -12,11 +12,13 @@ class NotificationModel extends Model
     {
         $sql = "INSERT INTO notifications (user_id, message, type) VALUES (:user_id, :message, :type)";
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
+        return $stmt->execute(
+            [
             'user_id' => $userId,
             'message' => $message,
             'type' => $type
-        ]);
+            ]
+        );
     }
 
     public function getUnreadNotifications($userId)

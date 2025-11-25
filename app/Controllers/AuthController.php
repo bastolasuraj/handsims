@@ -4,8 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use Exception;
-
-require_once APP_ROOT . '/config/ldap.php';
+use App\Helpers\ActiveDirectory;
 
 class AuthController extends Controller
 {
@@ -21,7 +20,7 @@ class AuthController extends Controller
         if (empty($data['password'])) {
             $errors[] = "Password is required.";
         } elseif (strlen($data['password']) > 255) {
-        // Passwords will be hashed, so this is for raw input max length
+            // Passwords will be hashed, so this is for raw input max length
             $errors[] = "Password cannot exceed 255 characters.";
         }
 
@@ -42,20 +41,20 @@ class AuthController extends Controller
                 $data = [
                     'error' => implode(' ', $errors),
                     'username' => $username,
-                    'ldap_status' => checkLDAPExtension() // Re-check LDAP status for error display
+                    'ldap_status' => $this->checkLDAPExtension() // Re-check LDAP status for error display
                 ];
                 $this->view('auth/login', $data, false);
                 return;
             }
 
             try {
-// Check if LDAP is available
-                $ldapStatus = checkLDAPExtension();
+                // Check if LDAP is available
+                $ldapStatus = $this->checkLDAPExtension();
                 $adUser = false;
                 error_log("LDAP Status: " . ($ldapStatus['enabled'] ? 'Enabled' : 'Disabled'));
                 if ($ldapStatus['enabled']) {
-                // Try AD authentication if LDAP is enabled
-                    $ad = new \ActiveDirectory();
+                    // Try AD authentication if LDAP is enabled
+                    $ad = new ActiveDirectory();
                     error_log("AD Object Created, isEnabled: " . ($ad->isEnabled() ? 'Yes' : 'No'));
                     if ($ad->isEnabled()) {
                         error_log("Attempting AD authentication for user: " . $username);
@@ -69,13 +68,13 @@ class AuthController extends Controller
                 }
 
                 if ($adUser) {
-// Check if user exists in local database
+                    // Check if user exists in local database
                     $userModel = $this->model('UserModel');
                     $localUser = $userModel->getByUsername($username);
-// Resolve department name to ID
+                    // Resolve department name to ID
                     $departmentId = $userModel->getDepartmentIdByName($adUser['department']);
                     if (!$localUser) {
-                    // Create user in local database if doesn't exist
+                        // Create user in local database if doesn't exist
                         $userData = [
                             'username' => $adUser['username'],
                             'email' => $adUser['email'],
@@ -86,12 +85,14 @@ class AuthController extends Controller
                         $userId = $userModel->createFromAD($userData);
                         $localUser = $userModel->getById($userId);
                     } else {
-                    // Update user info from AD
-                        $userModel->updateFromAD($localUser['id'], [
+                        // Update user info from AD
+                        $userModel->updateFromAD(
+                            $localUser['id'], [
                             'email' => $adUser['email'],
                             'full_name' => $adUser['full_name'],
                             'department_id' => $departmentId // Use department_id
-                        ]);
+                            ]
+                        );
                     }
 
                     // Set session variables
@@ -101,11 +102,11 @@ class AuthController extends Controller
                     $_SESSION['full_name'] = $adUser['full_name'];
                     $_SESSION['auth_type'] = 'AD';
                     $this->addLog("User logged in via AD", "Username: " . $username);
-// Check for returnTo parameter
+                    // Check for returnTo parameter
                     $returnTo = $_GET['returnTo'] ?? $_POST['returnTo'] ?? '/dashboard';
                     $this->redirect($returnTo);
                 } else {
-                // If AD auth fails or is not available, try local authentication
+                    // If AD auth fails or is not available, try local authentication
                     $userModel = $this->model('UserModel');
                     $user = $userModel->authenticate($username, $password);
                     if ($user && $user['auth_type'] === 'local') {
@@ -115,11 +116,11 @@ class AuthController extends Controller
                         $_SESSION['full_name'] = $user['full_name'];
                         $_SESSION['auth_type'] = 'local';
                         $this->addLog("User logged in (local)", "Username: " . $username);
-        // Check for returnTo parameter
+                        // Check for returnTo parameter
                         $returnTo = $_GET['returnTo'] ?? $_POST['returnTo'] ?? '/dashboard';
                         $this->redirect($returnTo);
                     } else {
-    // Log failed login attempt
+                        // Log failed login attempt
                         $this->addFailedLoginLog($username, $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
                         $errorMessage = 'Invalid credentials';
                         if (!$ldapStatus['enabled']) {
@@ -136,9 +137,9 @@ class AuthController extends Controller
             } catch (Exception $e) {
                 error_log('Login error: ' . $e->getMessage());
                 error_log('Stack trace: ' . $e->getTraceAsString());
-            // Log failed login attempt due to error
+                // Log failed login attempt due to error
                 $this->addFailedLoginLog($username, $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1', 'Authentication error: ' . $e->getMessage());
-            // Provide more detailed error in development
+                // Provide more detailed error in development
                 $errorMessage = 'Authentication service unavailable. Please try again later.';
                 if (ini_get('display_errors')) {
                     $errorMessage .= ' (Error: ' . $e->getMessage() . ')';
@@ -173,7 +174,7 @@ class AuthController extends Controller
     private function validateRegisterData($data, $isUpdate = false)
     {
         $errors = [];
-// Validate username
+        // Validate username
         if (empty($data['username'])) {
             $errors[] = "Username is required.";
         } elseif (strlen($data['username']) > 50) {
@@ -182,7 +183,7 @@ class AuthController extends Controller
 
         // Validate password (only if adding or if password is provided for update)
         if (!$isUpdate || (!empty($data['password']) && !$isUpdate)) {
-// Require password for add, optional for edit
+            // Require password for add, optional for edit
             if (empty($data['password'])) {
                 $errors[] = "Password is required.";
             } elseif (strlen($data['password']) < 8) {
@@ -223,7 +224,7 @@ class AuthController extends Controller
     public function register()
     {
         $this->requireAuth();
-// Only admins can register new users
+        // Only admins can register new users
         if ($_SESSION['role'] !== 'admin') {
             $this->redirect('/dashboard');
         }
@@ -254,5 +255,38 @@ class AuthController extends Controller
         } else {
             $this->view('auth/register');
         }
+    }
+
+    private function checkLDAPExtension()
+    {
+        if (!defined('LDAP_ENABLED') || !LDAP_ENABLED) {
+            return [
+                'enabled' => false,
+                'message' => 'LDAP is not enabled or configured.',
+                'instructions' => [] // Instructions might be in a view or config
+            ];
+        }
+
+        if (!extension_loaded('ldap')) {
+            return [
+                'enabled' => false,
+                'message' => 'LDAP extension for PHP is not loaded.',
+                'instructions' => [
+                    'windows_xampp' => [
+                        '1. Open php.ini file (usually in C:\xampp\php\php.ini)',
+                        '2. Find the line ;extension=ldap',
+                        '3. Remove the semicolon to uncomment: extension=ldap',
+                        '4. Save the file',
+                        '5. Restart Apache from XAMPP Control Panel'
+                    ],
+                    'linux' => [
+                        '1. Install php-ldap: sudo apt-get install php-ldap (Ubuntu/Debian) or sudo yum install php-ldap (CentOS/RHEL)',
+                        '2. Restart Apache: sudo service apache2 restart'
+                    ]
+                ]
+            ];
+        }
+        
+        return ['enabled' => true];
     }
 }

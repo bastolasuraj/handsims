@@ -12,7 +12,7 @@ class PublicLogController extends Controller
         // Remove this controller in production!
 
         $logModel = $this->model('LogModel');
-// Handle search
+        // Handle search
         $searchTerm = $_GET['search'] ?? '';
         $dateFrom = $_GET['date_from'] ?? '';
         $dateTo = $_GET['date_to'] ?? '';
@@ -27,7 +27,7 @@ class PublicLogController extends Controller
 
         // Format logs for display
         $formattedLogs = $this->formatLogs($logs);
-// Set dummy session data for the view
+        // Set dummy session data for the view
         $_SESSION['role'] = 'admin';
         $_SESSION['username'] = 'Guest Viewer';
         $data = [

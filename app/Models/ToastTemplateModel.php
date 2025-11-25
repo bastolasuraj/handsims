@@ -36,10 +36,12 @@ class ToastTemplateModel extends Model
     {
         $sql = "UPDATE toast_templates SET template_message = :message, updated_at = NOW() WHERE template_key = :key";
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
+        return $stmt->execute(
+            [
             'key' => $key,
             'message' => $message
-        ]);
+            ]
+        );
     }
 
     /**
@@ -100,8 +102,8 @@ class ToastTemplateModel extends Model
     /**
      * Format a message by replacing placeholders with actual values
      *
-     * @param string $templateKey The template key to use
-     * @param array $data Associative array of placeholder => value pairs
+     * @param  string $templateKey The template key to use
+     * @param  array  $data        Associative array of placeholder => value pairs
      * @return string The formatted message
      */
     public function formatMessage($templateKey, $data = [])

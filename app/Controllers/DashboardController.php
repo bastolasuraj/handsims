@@ -18,13 +18,15 @@ class DashboardController extends Controller
         $logModel = $this->model('LogModel');
         $notificationModel = $this->model('NotificationModel');
 
+        // Fetch low stock items once to avoid multiple queries
+        $lowStockItems = $inventoryModel->getLowStockItemsDetailed();
+
         // Low stock notification logic
         if (in_array($_SESSION['role'], ['admin', 'manager'])) {
             $lastCheck = $_SESSION['last_low_stock_check'] ?? 0;
             $checkInterval = 3600; // 1 hour
 
             if (time() - $lastCheck > $checkInterval) {
-                $lowStockItems = $inventoryModel->getLowStockItems();
                 foreach ($lowStockItems as $item) {
                     $message = "Low stock alert: " . htmlspecialchars($item['product_type']) .
                                " (Part No: " . htmlspecialchars($item['part_number']) . ") is running low at " .
@@ -40,7 +42,7 @@ class DashboardController extends Controller
         // Get dashboard statistics
         $data = [
             'total_products' => $productModel->count(),
-            'low_stock_items' => $inventoryModel->getLowStockItems(),
+            'low_stock_items' => $lowStockItems,
             'recent_transactions' => $transactionModel->getTransactionHistory(['limit' => 10]),
             'recent_logs' => $logModel->getLogs(5),
             'stock_by_location' => $this->getStockByLocation($inventoryModel)
@@ -106,12 +108,14 @@ class DashboardController extends Controller
             }
             $types = $this->db->query("SELECT id FROM types")->fetchAll();
             if (empty($types)) {
-                $this->db->exec("INSERT INTO types (name, description) VALUES 
+                $this->db->exec(
+                    "INSERT INTO types (name, description) VALUES 
                     ('Type A', 'Product Type A'),
                     ('Type B', 'Product Type B'),
                     ('Type C', 'Product Type C'),
                     ('Type D', 'Product Type D'),
-                    ('Type E', 'Product Type E')");
+                    ('Type E', 'Product Type E')"
+                );
                 $types = $this->db->query("SELECT id FROM types")->fetchAll();
             }
 
@@ -170,7 +174,8 @@ class DashboardController extends Controller
                     $inventoryModel->updateStock($p['id'], $locationId, $sizeId, $qty, 'add');
 
                     // Add matching IN transaction
-                    $transactionModel->addTransaction([
+                    $transactionModel->addTransaction(
+                        [
                         'transaction_type' => 'IN',
                         'product_id' => $p['id'],
                         'location_id' => $locationId,
@@ -181,14 +186,16 @@ class DashboardController extends Controller
                         'remarks' => 'Demo seed IN',
                         'seller_id' => $sellerIds[array_rand($sellerIds)],
                         'price_per_unit' => rand(10, 1000) / 10
-                    ]);
+                        ]
+                    );
 
                     // Add some OUT transactions
                     if (rand(1, 3) == 1) {
                         $outQty = rand(1, 5);
                         if ($qty > $outQty) {
                             $inventoryModel->updateStock($p['id'], $locationId, $sizeId, $outQty, 'subtract');
-                            $transactionModel->addTransaction([
+                            $transactionModel->addTransaction(
+                                [
                                 'transaction_type' => 'OUT',
                                 'product_id' => $p['id'],
                                 'location_id' => $locationId,
@@ -199,7 +206,8 @@ class DashboardController extends Controller
                                 'remarks' => 'Demo seed OUT',
                                 'seller_id' => null,
                                 'price_per_unit' => null
-                            ]);
+                                ]
+                            );
                         }
                     }
                 }
@@ -233,7 +241,7 @@ class DashboardController extends Controller
         $data = [
             'total_products' => $productModel->count(),
             'total_inventory' => $inventoryModel->getTotalStockQuantity(), // Assuming this method exists
-            'low_stock_items' => count($inventoryModel->getLowStockItems()),
+            'low_stock_items' => count($inventoryModel->getLowStockItemsDetailed()),
             'todays_transactions' => $transactionModel->getTodaysTransactionCount() // Assuming this method exists
         ];
 

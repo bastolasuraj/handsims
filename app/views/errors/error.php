@@ -5,68 +5,6 @@ if (!headers_sent()) {
     header('Cache-Control: post-check=0, pre-check=0', false);
     header('Pragma: no-cache');
 }
-
-// Load random humor from database
-$jokeLine = '';
-try {
-    // Try to get database connection - use APP_ROOT if defined, otherwise calculate path
-    if (defined('APP_ROOT')) {
-        require_once APP_ROOT . '/config/database.php';
-    } else {
-        // Fallback path calculation: app/views/errors -> go up 3 levels
-        $rootPath = dirname(__FILE__, 4); // Goes to h_and_s_inventory_management
-        require_once $rootPath . '/config/database.php';
-    }
-    $db = Database::getInstance()->getConnection();
-
-    // Fetch a random active humor line
-    $stmt = $db->prepare("
-        SELECT content 
-        FROM humor_lines 
-        WHERE is_active = 1 
-        ORDER BY RAND() 
-        LIMIT 1
-    ");
-    $stmt->execute();
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($result && !empty($result['content'])) {
-        $jokeLine = $result['content'];
-    }
-} catch (Exception $e) {
-    // Fallback to JSON file if database fails
-    try {
-        // Use the same root path calculation
-        if (defined('APP_ROOT')) {
-            $jsonPath = APP_ROOT . DIRECTORY_SEPARATOR . 'jokes_and_sarcasms.json';
-        } else {
-            $jsonPath = dirname(__FILE__, 4) . DIRECTORY_SEPARATOR . 'jokes_and_sarcasms.json';
-        }
-        if (is_readable($jsonPath)) {
-            $json = file_get_contents($jsonPath);
-            $data = json_decode($json, true);
-            if (json_last_error() === JSON_ERROR_NONE && is_array($data)) {
-                $pool = [];
-                if (!empty($data['jokes']) && is_array($data['jokes'])) {
-                    $pool = array_merge($pool, $data['jokes']);
-                }
-                if (!empty($data['sarcasms']) && is_array($data['sarcasms'])) {
-                    $pool = array_merge($pool, $data['sarcasms']);
-                }
-                if (!empty($data['warehouse_specific']) && is_array($data['warehouse_specific'])) {
-                    $pool = array_merge($pool, $data['warehouse_specific']);
-                }
-                if (!empty($pool)) {
-                    // Use cryptographically secure random for better randomness
-                    $index = random_int(0, count($pool) - 1);
-                    $jokeLine = $pool[$index];
-                }
-            }
-        }
-    } catch (Throwable $e) {
-        // fail silently; no jokes
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">

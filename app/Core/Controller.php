@@ -2,6 +2,8 @@
 
 namespace App\Core;
 
+use App\Core\Database;
+
 // Base Controller class
 class Controller
 {
@@ -10,7 +12,7 @@ class Controller
 
     public function __construct()
     {
-        $this->db = \Database::getInstance()->getConnection();
+        $this->db = Database::getInstance()->getConnection();
     }
 
     // Load model
@@ -20,7 +22,7 @@ class Controller
         if (class_exists($modelClass)) {
             return new $modelClass($this->db);
         }
-        throw new Exception("Model not found: " . $modelClass);
+        throw new \Exception("Model not found: " . $modelClass);
     }
 
     // Load view
@@ -32,15 +34,17 @@ class Controller
             $this->notifications = $notificationModel->getUnreadNotifications($_SESSION['user_id']);
 
             // Prioritize inventory notifications
-            usort($this->notifications, function ($a, $b) {
-                if ($a['type'] == 'inventory' && $b['type'] != 'inventory') {
-                    return -1;
+            usort(
+                $this->notifications, function ($a, $b) {
+                    if ($a['type'] == 'inventory' && $b['type'] != 'inventory') {
+                        return -1;
+                    }
+                    if ($a['type'] != 'inventory' && $b['type'] == 'inventory') {
+                        return 1;
+                    }
+                    return strtotime($b['created_at']) - strtotime($a['created_at']);
                 }
-                if ($a['type'] != 'inventory' && $b['type'] == 'inventory') {
-                    return 1;
-                }
-                return strtotime($b['created_at']) - strtotime($a['created_at']);
-            });
+            );
         }
 
         $data['notifications'] = $this->notifications;

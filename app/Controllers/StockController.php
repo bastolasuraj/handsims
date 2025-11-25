@@ -38,7 +38,7 @@ class StockController extends Controller
                     'price_per_unit' => $pricePerUnit
                 ];
 
-                $errors = $this->validateStockData($data, 'add');
+                $errors = $this->validateStockData($data, 'add', $this->model('ProductModel'));
                 if (!empty($errors)) {
                     throw new InvalidArgumentException(implode(' ', $errors));
                 }
@@ -49,7 +49,8 @@ class StockController extends Controller
 
                 // Add transaction record
                 $transactionModel = $this->model('TransactionModel');
-                $transactionModel->addTransaction([
+                $transactionModel->addTransaction(
+                    [
                     'transaction_type' => 'IN',
                     'product_id' => $productId,
                     'location_id' => $locationId,
@@ -60,7 +61,8 @@ class StockController extends Controller
                     'remarks' => $remarks,
                     'seller_id' => $sellerId,
                     'price_per_unit' => $pricePerUnit
-                ]);
+                    ]
+                );
 
                 // Add log
                 $productModel = $this->model('ProductModel');
@@ -88,13 +90,15 @@ class StockController extends Controller
 
                 // Personalized success message using toast template
                 $toastTemplateModel = $this->model('ToastTemplateModel');
-                $_SESSION['success'] = $toastTemplateModel->formatMessage('stock_add_success', [
+                $_SESSION['success'] = $toastTemplateModel->formatMessage(
+                    'stock_add_success', [
                     '%q' => $quantity,
                     '%s' => $sizeName,
                     '%p' => $product['product_type'],
                     '%l' => $locationName
-                ]);
-            } catch (Exception $e) {
+                    ]
+                );
+            } catch (\Exception $e) {
                 $_SESSION['error'] = 'Failed to add stock: ' . $e->getMessage();
             }
 
@@ -122,17 +126,21 @@ class StockController extends Controller
 
         if (isset($_GET['location_id'])) {
             $locationId = (int)$_GET['location_id'];
-            $selectedLocation = array_filter($data['locations'], function ($loc) use ($locationId) {
-                return $loc['id'] == $locationId;
-            });
+            $selectedLocation = array_filter(
+                $data['locations'], function ($loc) use ($locationId) {
+                    return $loc['id'] == $locationId;
+                }
+            );
             $selectedLocation = !empty($selectedLocation) ? reset($selectedLocation) : null;
         }
 
         if (isset($_GET['size_id'])) {
             $sizeId = (int)$_GET['size_id'];
-            $selectedSize = array_filter($data['sizes'], function ($size) use ($sizeId) {
-                return $size['id'] == $sizeId;
-            });
+            $selectedSize = array_filter(
+                $data['sizes'], function ($size) use ($sizeId) {
+                    return $size['id'] == $sizeId;
+                }
+            );
             $selectedSize = !empty($selectedSize) ? reset($selectedSize) : null;
         }
 
@@ -166,7 +174,7 @@ class StockController extends Controller
                 'remarks' => $remarks
             ];
 
-            $errors = $this->validateStockData($data, 'out');
+            $errors = $this->validateStockData($data, 'out', $this->model('ProductModel'));
             if (!empty($errors)) {
                 $_SESSION['error'] = implode(' ', $errors);
                 $this->redirect('/stock/out');
@@ -189,7 +197,8 @@ class StockController extends Controller
 
             // Add transaction record
             $transactionModel = $this->model('TransactionModel');
-            $transactionModel->addTransaction([
+            $transactionModel->addTransaction(
+                [
                 'transaction_type' => 'OUT',
                 'product_id' => $productId,
                 'location_id' => $locationId,
@@ -200,7 +209,8 @@ class StockController extends Controller
                 'remarks' => $remarks,
                 'seller_id' => null,
                 'price_per_unit' => null
-            ]);
+                ]
+            );
 
             // Add log
             $productModel = $this->model('ProductModel');
@@ -230,13 +240,15 @@ class StockController extends Controller
 
             // Personalized success message using toast template
             $toastTemplateModel = $this->model('ToastTemplateModel');
-            $_SESSION['success'] = $toastTemplateModel->formatMessage('stock_out_success', [
+            $_SESSION['success'] = $toastTemplateModel->formatMessage(
+                'stock_out_success', [
                 '%q' => $quantity,
                 '%s' => $sizeName,
                 '%p' => $product['product_type'],
                 '%d' => $departmentName,
                 '%l' => $locationName
-            ]);
+                ]
+            );
             $this->redirect('/stock/out');
         }
 
@@ -261,17 +273,21 @@ class StockController extends Controller
 
         if (isset($_GET['location_id'])) {
             $locationId = (int)$_GET['location_id'];
-            $selectedLocation = array_filter($data['locations'], function ($loc) use ($locationId) {
-                return $loc['id'] == $locationId;
-            });
+            $selectedLocation = array_filter(
+                $data['locations'], function ($loc) use ($locationId) {
+                    return $loc['id'] == $locationId;
+                }
+            );
             $selectedLocation = !empty($selectedLocation) ? reset($selectedLocation) : null;
         }
 
         if (isset($_GET['size_id'])) {
             $sizeId = (int)$_GET['size_id'];
-            $selectedSize = array_filter($data['sizes'], function ($size) use ($sizeId) {
-                return $size['id'] == $sizeId;
-            });
+            $selectedSize = array_filter(
+                $data['sizes'], function ($size) use ($sizeId) {
+                    return $size['id'] == $sizeId;
+                }
+            );
             $selectedSize = !empty($selectedSize) ? reset($selectedSize) : null;
         }
 
@@ -290,12 +306,19 @@ class StockController extends Controller
         $locations = $this->getLocations();
 
         $selectedLocation = $_GET['location'] ?? null;
-        $stockData = $inventoryModel->getStockByLocation($selectedLocation);
+        $filter = $_GET['filter'] ?? null;
+
+        if ($filter === 'low_stock') {
+            $stockData = $inventoryModel->getLowStockItemsDetailed($selectedLocation);
+        } else {
+            $stockData = $inventoryModel->getStockByLocation($selectedLocation);
+        }
 
         $data = [
             'locations' => $locations,
             'stock' => $stockData,
-            'selected_location' => $selectedLocation
+            'selected_location' => $selectedLocation,
+            'filter' => $filter
         ];
 
         // Check if it's an AJAX request
@@ -327,7 +350,7 @@ class StockController extends Controller
                 'quantity' => $quantity
             ];
 
-            $errors = $this->validateStockData($data, 'transfer');
+            $errors = $this->validateStockData($data, 'transfer', $this->model('ProductModel'));
             if ($toLocationId === '' || $toLocationId <= 0) {
                 $errors[] = 'Please select a valid destination location.';
             }
@@ -353,8 +376,10 @@ class StockController extends Controller
                 $result = $inventoryModel->subtractStock($productId, $fromLocationId, $sizeId, $quantity);
 
                 if (!$result['ok']) {
-                    throw new RuntimeException('Insufficient stock at source location. Available: ' .
-                        ($result['available'] ?? 0) . ', Requested: ' . $quantity);
+                    throw new RuntimeException(
+                        'Insufficient stock at source location. Available: ' .
+                        ($result['available'] ?? 0) . ', Requested: ' . $quantity
+                    );
                 }
 
                 // Add to destination
@@ -372,7 +397,8 @@ class StockController extends Controller
                 }
 
                 // Record transaction as two entries for traceability
-                $transactionModel->addTransaction([
+                $transactionModel->addTransaction(
+                    [
                     'transaction_type' => 'OUT',
                     'product_id' => $productId,
                     'location_id' => $fromLocationId,
@@ -383,9 +409,11 @@ class StockController extends Controller
                     'remarks' => $transferRemark,
                     'seller_id' => null,
                     'price_per_unit' => null
-                ]);
+                    ]
+                );
 
-                $transactionModel->addTransaction([
+                $transactionModel->addTransaction(
+                    [
                     'transaction_type' => 'IN',
                     'product_id' => $productId,
                     'location_id' => $toLocationId,
@@ -396,7 +424,8 @@ class StockController extends Controller
                     'remarks' => $transferRemark,
                     'seller_id' => null,
                     'price_per_unit' => null
-                ]);
+                    ]
+                );
 
                 $db->commit();
 
@@ -422,15 +451,16 @@ class StockController extends Controller
 
                 // Personalized success message using toast template
                 $toastTemplateModel = $this->model('ToastTemplateModel');
-                $_SESSION['success'] = $toastTemplateModel->formatMessage('stock_transfer_success', [
+                $_SESSION['success'] = $toastTemplateModel->formatMessage(
+                    'stock_transfer_success', [
                     '%q' => $quantity,
                     '%s' => $sizeName,
                     '%p' => $product['product_type'],
                     '%f' => $fromLocationName,
                     '%t' => $toLocationName
-                ]);
-                return $this->redirect('/stock/transfer');
-            } catch (Exception $e) {
+                    ]
+                );
+            } catch (\Exception $e) {
                 $db->rollBack();
                 $_SESSION['error'] = 'Transfer failed: ' . $e->getMessage();
                 return $this->redirect('/stock/transfer');
@@ -457,17 +487,21 @@ class StockController extends Controller
 
         if (isset($_GET['from_location_id'])) {
             $locationId = (int)$_GET['from_location_id'];
-            $selectedFromLocation = array_filter($data['locations'], function ($loc) use ($locationId) {
-                return $loc['id'] == $locationId;
-            });
+            $selectedFromLocation = array_filter(
+                $data['locations'], function ($loc) use ($locationId) {
+                    return $loc['id'] == $locationId;
+                }
+            );
             $selectedFromLocation = !empty($selectedFromLocation) ? reset($selectedFromLocation) : null;
         }
 
         if (isset($_GET['size_id'])) {
             $sizeId = (int)$_GET['size_id'];
-            $selectedSize = array_filter($data['sizes'], function ($size) use ($sizeId) {
-                return $size['id'] == $sizeId;
-            });
+            $selectedSize = array_filter(
+                $data['sizes'], function ($size) use ($sizeId) {
+                    return $size['id'] == $sizeId;
+                }
+            );
             $selectedSize = !empty($selectedSize) ? reset($selectedSize) : null;
         }
 
@@ -683,7 +717,8 @@ class StockController extends Controller
                 $inventoryModel->updateStock($productId, $locationId, $sizeId, $quantity, 'add');
 
                 // Add transaction record
-                $transactionModel->addTransaction([
+                $transactionModel->addTransaction(
+                    [
                     'transaction_type' => 'IN',
                     'product_id' => $productId,
                     'location_id' => $locationId,
@@ -694,19 +729,19 @@ class StockController extends Controller
                     'remarks' => "Bulk add: " . $remarks,
                     'seller_id' => $sellerId,
                     'price_per_unit' => $pricePerUnit
-                ]);
+                    ]
+                );
 
                 $successCount++;
             }
 
             if ($errorCount > 0) {
-                throw new Exception("Errors occurred during bulk import.");
+                throw new \Exception("Errors occurred during bulk import.");
             }
 
             $this->db->commit();
             $_SESSION['success'] = "Bulk stock import finished. {$successCount} records imported successfully.";
-        } catch (Exception $e) {
-            $this->db->rollBack();
+        } catch (\Exception $e) {            $this->db->rollBack();
             $message = "Bulk import failed. " . $e->getMessage();
             if ($errorCount > 0) {
                 $_SESSION['error'] = $message . " {$errorCount} rows failed. Errors: " . implode('; ', $errors);
@@ -742,7 +777,7 @@ class StockController extends Controller
         exit;
     }
 
-    private function validateStockData($data, $type = 'add')
+    private function validateStockData($data, $type = 'add', $productModel = null)
     {
         $errors = [];
 
@@ -752,6 +787,24 @@ class StockController extends Controller
 
         if (empty($data['location_id']) || !is_numeric($data['location_id']) || (int)$data['location_id'] <= 0) {
             $errors[] = "A valid location must be selected.";
+        }
+
+        $product = null;
+        if (!empty($data['product_id']) && $productModel) {
+            $product = $productModel->getById((int)$data['product_id']);
+        }
+
+        // Conditionally validate size_id based on whether the product has specific sizes
+        if ($product && empty($product['available_sizes'])) {
+            // Product does not have specific sizes, size_id is optional
+            if (isset($data['size_id']) && !empty($data['size_id'])) {
+                $errors[] = "This product does not use sizes, but a size was provided.";
+            }
+        } else {
+            // Product has specific sizes, size_id is required and must be valid
+            if (empty($data['size_id']) || !is_numeric($data['size_id']) || (int)$data['size_id'] <= 0) {
+                $errors[] = "A valid size must be selected.";
+            }
         }
 
         if (empty($data['quantity']) || !is_numeric($data['quantity']) || (int)$data['quantity'] <= 0) {
@@ -767,6 +820,9 @@ class StockController extends Controller
         if ($type === 'add') {
             if (isset($data['price_per_unit']) && !empty($data['price_per_unit']) && !is_numeric($data['price_per_unit'])) {
                 $errors[] = "Price per unit must be a valid number.";
+            }
+            if (empty($data['seller_id']) || !is_numeric($data['seller_id']) || (int)$data['seller_id'] <= 0) {
+                $errors[] = "A valid seller must be selected.";
             }
         }
 

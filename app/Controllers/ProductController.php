@@ -468,9 +468,9 @@ class ProductController extends Controller
             $errors[] = "Product Type is required.";
         }
 
-        // Validate category_id (optional)
-        if (isset($data['category_id']) && !empty($data['category_id']) && (!is_numeric($data['category_id']) || (int)$data['category_id'] <= 0)) {
-            $errors[] = "Invalid Category ID.";
+        // Validate category_id
+        if (empty($data['category_id']) || !is_numeric($data['category_id']) || (int)$data['category_id'] <= 0) {
+            $errors[] = "Category is required.";
         }
 
         // Validate description
@@ -479,8 +479,13 @@ class ProductController extends Controller
         }
 
         // Validate low_stock_threshold
-        if (isset($data['low_stock_threshold']) && (!is_numeric($data['low_stock_threshold']) || (int)$data['low_stock_threshold'] < 0)) {
-            $errors[] = "Low stock threshold must be a non-negative number.";
+        if (!isset($data['low_stock_threshold']) || $data['low_stock_threshold'] === '' || !is_numeric($data['low_stock_threshold']) || (int)$data['low_stock_threshold'] < 0) {
+            $errors[] = "Low stock threshold is required and must be a non-negative number.";
+        }
+        
+        // Validate available_sizes
+        if (empty($data['available_sizes'])) {
+            $errors[] = "At least one size must be selected.";
         }
 
         // For update operations, validate ID

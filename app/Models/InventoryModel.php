@@ -61,12 +61,14 @@ class InventoryModel extends Model
 
         $stmt = $this->db->prepare($sql);
 
-        return $stmt->execute([
+        return $stmt->execute(
+            [
             'product_id' => $productId,
             'location_id' => $locationId,
             'size_id' => ($sizeId === '' ? null : $sizeId),
             'quantity' => $quantity
-        ]);
+            ]
+        );
     }
 
     /**
@@ -142,6 +144,29 @@ class InventoryModel extends Model
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function getLowStockItemsDetailed($locationId = null)
+    {
+        $sql = "SELECT i.product_id, i.location_id, i.size_id, p.part_number, t.name as product_type, l.name as location_name, ps.size, i.quantity, i.min_quantity, p.low_stock_threshold, i.remarks, i.last_updated
+                FROM inventory i
+                JOIN products p ON i.product_id = p.id
+                JOIN locations l ON i.location_id = l.id
+                LEFT JOIN product_sizes ps ON i.size_id = ps.id
+                LEFT JOIN types t ON p.type_id = t.id
+                WHERE i.quantity <= p.low_stock_threshold";
+
+        $params = [];
+        if ($locationId) {
+            $sql .= " AND i.location_id = :location_id";
+            $params['location_id'] = $locationId;
+        }
+
+        $sql .= " ORDER BY i.quantity ASC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 

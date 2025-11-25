@@ -30,24 +30,24 @@ class ReportController extends Controller
             'date_to' => $_POST['date_to'] ?? null
         ];
         switch ($reportType) {
-            case 'inventory':
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      $data = $this->generateInventoryReport($filters);
+        case 'inventory':
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $data = $this->generateInventoryReport($filters);
 
-                break;
-            case 'transactions':
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $data = $this->generateTransactionReport($filters);
+            break;
+        case 'transactions':
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              $data = $this->generateTransactionReport($filters);
 
-                break;
-            case 'low_stock':
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $data = $this->generateLowStockReport($filters);
+            break;
+        case 'low_stock':
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              $data = $this->generateLowStockReport($filters);
 
-                break;
-            case 'activity':
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $data = $this->generateActivityReport($filters);
+            break;
+        case 'activity':
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              $data = $this->generateActivityReport($filters);
 
-                break;
-            default:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $data = [];
+            break;
+        default:
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              $data = [];
         }
 
         if ($format === 'csv') {
@@ -143,7 +143,7 @@ class ReportController extends Controller
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="' . $filename . '_' . date('Y-m-d_H-i-s') . '.csv"');
         $output = fopen('php://output', 'w');
-// Add headers
+        // Add headers
         if (!empty($data)) {
             fputcsv($output, array_keys($data[0]));
         }
@@ -184,7 +184,7 @@ class ReportController extends Controller
                 <p>Generated by: ' . $_SESSION['username'] . '</p>
             </div>
             <table>';
-// Add headers
+        // Add headers
         if (!empty($data)) {
             $html .= '<tr>';
             foreach (array_keys($data[0]) as $header) {

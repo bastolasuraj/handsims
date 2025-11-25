@@ -87,6 +87,7 @@ $router->addRoute('/settings/toast-templates/reset-all', 'ToastSettingsControlle
 // Database viewer (local users only)
 $router->addRoute('/settings/database', 'DatabaseController', 'index');
 $router->addRoute('/settings/database/table', 'DatabaseController', 'table');
+$router->addRoute('/database-schema', 'SchemaController', 'index');
 
 // Public log viewer
 $router->addRoute('/public-logs', 'PublicLogController', 'index');

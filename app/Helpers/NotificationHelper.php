@@ -85,15 +85,15 @@ class NotificationHelper
         $type = 'inventory';
 
         switch ($item['stock_status']) {
-            case 'out_of_stock':
-                $message = "⚠️ OUT OF STOCK: {$productName}{$size} at {$location}. Restock immediately!";
-                break;
-            case 'critical':
-                $message = "🔴 CRITICAL: Only {$quantity} units of {$productName}{$size} left at {$location} (Min: {$minQty})";
-                break;
-            case 'low':
-                $message = "🟡 LOW STOCK: {$productName}{$size} at {$location} has {$quantity} units (Min: {$minQty})";
-                break;
+        case 'out_of_stock':
+            $message = "⚠️ OUT OF STOCK: {$productName}{$size} at {$location}. Restock immediately!";
+            break;
+        case 'critical':
+            $message = "🔴 CRITICAL: Only {$quantity} units of {$productName}{$size} left at {$location} (Min: {$minQty})";
+            break;
+        case 'low':
+            $message = "🟡 LOW STOCK: {$productName}{$size} at {$location} has {$quantity} units (Min: {$minQty})";
+            break;
         }
 
         if ($message) {

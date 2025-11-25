@@ -22,9 +22,13 @@
         <?php
         $totalItems = count($stock);
         $totalQuantity = array_sum(array_column($stock, 'quantity'));
-        $lowStockCount = count(array_filter($stock, function ($item) {
-            return $item['quantity'] <= $item['min_quantity'];
-        }));
+        $lowStockCount = count(
+            array_filter(
+                $stock, function ($item) {
+                    return $item['quantity'] <= $item['low_stock_threshold'];
+                }
+            )
+        );
         $uniqueProducts = count(array_unique(array_column($stock, 'product_id')));
         ?>
         
@@ -195,7 +199,7 @@
                     </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="text-sm text-gray-600"><?php echo $item['min_quantity']; ?></span>
+                    <span class="text-sm text-gray-600"><?php echo $item['low_stock_threshold']; ?></span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                     <?php if ($item['quantity'] == 0) : ?>

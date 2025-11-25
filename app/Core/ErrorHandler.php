@@ -2,6 +2,10 @@
 
 namespace App\Core;
 use ErrorException;
+use PDO;
+use PDOException;
+use Throwable;
+use App\Core\Database; // Add this line
 
 class ErrorHandler
 {
@@ -110,6 +114,56 @@ class ErrorHandler
 
         http_response_code($code);
 
+        // Fetch joke line
+        $jokeLine = '';
+        try {
+            $db = Database::getInstance()->getConnection(); // Use fully qualified name
+            if ($db) { // Only try to fetch if connection is successful
+                $stmt = $db->prepare(
+                    "
+                    SELECT content 
+                    FROM humor_lines 
+                    WHERE is_active = 1 
+                    ORDER BY RAND() 
+                    LIMIT 1
+                "
+                );
+                $stmt->execute();
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($result && !empty($result['content'])) {
+                    $jokeLine = $result['content'];
+                }
+            }
+        } catch (\Exception $e) { // Use global Exception
+            // Fallback to JSON file if database fails or connection is not available
+            try {
+                $jsonPath = APP_ROOT . DIRECTORY_SEPARATOR . 'jokes_and_sarcasms.json';
+                if (is_readable($jsonPath)) {
+                    $json = file_get_contents($jsonPath);
+                    $data = json_decode($json, true);
+                    if (json_last_error() === JSON_ERROR_NONE && is_array($data)) {
+                        $pool = [];
+                        if (!empty($data['jokes']) && is_array($data['jokes'])) {
+                            $pool = array_merge($pool, $data['jokes']);
+                        }
+                        if (!empty($data['sarcasms']) && is_array($data['sarcasms'])) {
+                            $pool = array_merge($pool, $data['sarcasms']);
+                        }
+                        if (!empty($data['warehouse_specific']) && is_array($data['warehouse_specific'])) {
+                            $pool = array_merge($pool, $data['warehouse_specific']);
+                        }
+                        if (!empty($pool)) {
+                            $index = random_int(0, count($pool) - 1);
+                            $jokeLine = $pool[$index];
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Fail silently
+            }
+        }
+
         // Determine if we should show detailed errors (development mode)
         $showDetails = (defined('ENVIRONMENT') && ENVIRONMENT === 'development') ||
                        (isset($_SERVER['SERVER_NAME']) && in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1']));
@@ -177,7 +231,7 @@ class ErrorHandler
     public static function show500($message = null)
     {
         if ($message) {
-            $exception = new Exception($message);
+            $exception = new \Exception($message);
             self::handleException($exception);
         } else {
             self::displayErrorPage(500);

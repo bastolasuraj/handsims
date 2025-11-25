@@ -25,8 +25,8 @@
     },
     "scripts": {
         "test": "phpunit --configuration phpunit.xml",
-        "lint": "phpcs",
-        "lint:fix": "phpcbf",
-        "analyse": "phpstan analyse"
+        "lint": "phpcs app/",
+        "lint:fix": "phpcbf app/",
+        "analyse": "phpstan analyse app/"
     }
 }

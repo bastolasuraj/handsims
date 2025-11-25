@@ -15,13 +15,15 @@ class LogModel extends Model
                 VALUES (:user_id, :username, :action, :details, :ip)";
 
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
+        return $stmt->execute(
+            [
             'user_id' => $userId,
             'username' => $username,
             'action' => $action,
             'details' => $details,
             'ip' => $ip
-        ]);
+            ]
+        );
     }
 
     public function getLogs($limit = 100, $offset = 0)
@@ -69,23 +71,23 @@ class LogModel extends Model
     {
         $actions = [];
         switch ($category) {
-            case 'user':
-                $actions = ['User login', 'User logout'];
-                break;
-            case 'product':
-                $actions = ['Product added', 'Product updated', 'Product deleted'];
-                break;
-            case 'stock':
-                $actions = ['Stock added', 'Stock removed', 'Stock transferred'];
-                break;
-            case 'report':
-                $actions = ['Report generated'];
-                break;
-            case 'system':
-                $actions = ['Logs cleared'];
-                break;
-            default:
-                return $this->getLogs($limit, $offset);
+        case 'user':
+            $actions = ['User login', 'User logout'];
+            break;
+        case 'product':
+            $actions = ['Product added', 'Product updated', 'Product deleted'];
+            break;
+        case 'stock':
+            $actions = ['Stock added', 'Stock removed', 'Stock transferred'];
+            break;
+        case 'report':
+            $actions = ['Report generated'];
+            break;
+        case 'system':
+            $actions = ['Logs cleared'];
+            break;
+        default:
+            return $this->getLogs($limit, $offset);
         }
 
         if (empty($actions)) {

@@ -301,6 +301,16 @@ require_once __DIR__ . '/../../Helpers/clear_messages.php';
                                             <p class="text-xs text-gray-500">View database contents</p>
                                         </div>
                                     </a>
+                                    <a href="<?php echo APP_URL; ?>/database-schema"
+                                       class="flex items-center px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-teal-50 hover:to-cyan-50 rounded-lg transition-all duration-200 group">
+                                        <div class="bg-gradient-to-r from-teal-400 to-cyan-500 p-2 rounded-lg mr-3 group-hover:shadow-lg transition-shadow">
+                                            <i class="fas fa-sitemap text-white text-sm"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium">Database Schema</p>
+                                            <p class="text-xs text-gray-500">View database schema</p>
+                                        </div>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -466,6 +476,9 @@ require_once __DIR__ . '/../../Helpers/clear_messages.php';
                         </a>
                         <a href="<?php echo APP_URL; ?>/settings/database" class="block px-4 py-3 rounded-lg hover:bg-white/20">
                             <i class="fas fa-database mr-2"></i> Database Viewer
+                        </a>
+                        <a href="<?php echo APP_URL; ?>/database-schema" class="block px-4 py-3 rounded-lg hover:bg-white/20">
+                            <i class="fas fa-sitemap mr-2"></i> Database Schema
                         </a>
                     </div>
                     <?php endif; ?>

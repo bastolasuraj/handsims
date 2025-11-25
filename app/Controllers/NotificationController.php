@@ -21,15 +21,17 @@ class NotificationController extends Controller
         $notifications = $this->notificationModel->getUnreadNotifications($userId);
 
         // Prioritize inventory notifications
-        usort($notifications, function ($a, $b) {
-            if ($a['type'] == 'inventory' && $b['type'] != 'inventory') {
-                return -1;
+        usort(
+            $notifications, function ($a, $b) {
+                if ($a['type'] == 'inventory' && $b['type'] != 'inventory') {
+                    return -1;
+                }
+                if ($a['type'] != 'inventory' && $b['type'] == 'inventory') {
+                    return 1;
+                }
+                return strtotime($b['created_at']) - strtotime($a['created_at']);
             }
-            if ($a['type'] != 'inventory' && $b['type'] == 'inventory') {
-                return 1;
-            }
-            return strtotime($b['created_at']) - strtotime($a['created_at']);
-        });
+        );
 
         header('Content-Type: application/json');
         $this->json($notifications);

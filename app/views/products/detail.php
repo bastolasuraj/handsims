@@ -86,7 +86,7 @@
                 </div>
                 <div class="detail-row p-3 rounded-lg">
                     <dt class="text-sm font-semibold text-gray-500 mb-1">Product Type</dt>
-                    <dd class="text-lg font-medium text-gray-900"><?php echo htmlspecialchars($product['product_type']); ?></dd>
+                    <dd class="text-lg font-medium text-gray-900"><?php echo htmlspecialchars($product['product_type'] ?? ''); ?></dd>
                 </div>
                 <div class="detail-row p-3 rounded-lg">
                     <dt class="text-sm font-semibold text-gray-500 mb-1">Category</dt>
@@ -121,7 +121,7 @@
                 <?php
                 // Load autoloader and include barcode generator
                 if (file_exists(APP_ROOT . '/vendor/autoload.php')) {
-                    require_once APP_ROOT . '/vendor/autoload.php';
+                    include_once APP_ROOT . '/vendor/autoload.php';
                 }
                 require_once APP_ROOT . '/app/Helpers/BarcodeGenerator.php';
                 use App\Helpers\BarcodeGenerator;

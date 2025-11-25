@@ -32,7 +32,7 @@ class Router
                 $this->show404();
             }
         } else {
-        // Default to dashboard if no route specified
+            // Default to dashboard if no route specified
             if ($url === '/' || $url === '') {
                 $controller = new \App\Controllers\DashboardController();
                 $controller->index();
@@ -45,7 +45,7 @@ class Router
     private function show404()
     {
         header("HTTP/1.0 404 Not Found");
-// Use custom error handler if available
+        // Use custom error handler if available
         if (class_exists('\App\Core\ErrorHandler')) {
             \App\Core\ErrorHandler::show404();
             exit();

@@ -75,10 +75,12 @@ class DatabaseController extends Controller
                 ];
             }
             
-            $this->view('settings/database', [
+            $this->view(
+                'settings/database', [
                 'title' => 'Database Viewer',
                 'tables' => $tableData
-            ]);
+                ]
+            );
             
         } catch (\Exception $e) {
             $_SESSION['error'] = 'Error loading database: ' . $e->getMessage();
@@ -135,7 +137,8 @@ class DatabaseController extends Controller
             
             $totalPages = ceil($totalCount / $perPage);
             
-            $this->view('settings/database-table', [
+            $this->view(
+                'settings/database-table', [
                 'title' => 'Table: ' . $tableName,
                 'tableName' => $tableName,
                 'structure' => $structure,
@@ -144,7 +147,8 @@ class DatabaseController extends Controller
                 'currentPage' => $page,
                 'totalPages' => $totalPages,
                 'perPage' => $perPage
-            ]);
+                ]
+            );
             
         } catch (\Exception $e) {
             $_SESSION['error'] = 'Error loading table: ' . $e->getMessage();

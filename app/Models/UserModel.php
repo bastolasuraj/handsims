@@ -64,10 +64,12 @@ class UserModel extends Model
     {
         $sql = "UPDATE users SET password = :password WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
+        return $stmt->execute(
+            [
             'id' => $userId,
             'password' => password_hash($newPassword, PASSWORD_DEFAULT)
-        ]);
+            ]
+        );
     }
 
     public function getDepartmentIdByName($departmentName)

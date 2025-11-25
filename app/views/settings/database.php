@@ -140,11 +140,11 @@
                                         <td class="px-4 py-2 font-mono text-gray-600"><?php echo htmlspecialchars($column['Type']); ?></td>
                                         <td class="px-4 py-2"><?php echo $column['Null'] === 'YES' ? '✓' : '✗'; ?></td>
                                         <td class="px-4 py-2">
-                                            <?php if ($column['Key'] === 'PRI'): ?>
+                                            <?php if ($column['Key'] === 'PRI') : ?>
                                                 <span class="px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-semibold">PRI</span>
-                                            <?php elseif ($column['Key'] === 'MUL'): ?>
+                                            <?php elseif ($column['Key'] === 'MUL') : ?>
                                                 <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">MUL</span>
-                                            <?php elseif ($column['Key'] === 'UNI'): ?>
+                                            <?php elseif ($column['Key'] === 'UNI') : ?>
                                                 <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-semibold">UNI</span>
                                             <?php else: ?>
                                                 <span class="text-gray-400">-</span>
@@ -160,7 +160,7 @@
                     </div>
 
                     <!-- Table Data -->
-                    <?php if (!empty($table['data'])): ?>
+                    <?php if (!empty($table['data'])) : ?>
                     <div>
                         <h4 class="text-md font-bold text-gray-700 mb-3 flex items-center">
                             <i class="fas fa-list mr-2 text-green-500"></i>
@@ -198,7 +198,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <?php if ($table['count'] > 100): ?>
+                        <?php if ($table['count'] > 100) : ?>
                         <div class="mt-4 text-center">
                             <p class="text-sm text-gray-600">
                                 Showing 100 of <?php echo number_format($table['count']); ?> rows

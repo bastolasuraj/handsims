@@ -71,7 +71,7 @@
             ?>
         <div class="mt-6">
             <form method="POST" action="<?php echo APP_URL; ?>/dashboard/seed-demo" onsubmit="return confirm('This will generate demo data (products, inventory, transactions). Continue?');">
-                <?php require_once __DIR__ . '/../../Helpers/csrf.php';
+                <?php include_once __DIR__ . '/../../Helpers/csrf.php';
                 echo csrf_field(); ?>
                 <button type="submit" class="bg-white/20 backdrop-blur-lg hover:bg-white/30 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 border border-white/30">
                     <i class="fas fa-magic mr-2"></i>
@@ -112,7 +112,7 @@
             <h3 class="font-semibold mb-1">Low Stock Items</h3>
             <div class="flex items-center justify-between">
                 <span class="text-xs text-white/70">Need attention</span>
-                <a href="<?php echo APP_URL; ?>/stock/in-stock" class="text-white/90 hover:text-white transition-colors">
+                <a href="<?php echo APP_URL; ?>/stock/in-stock?filter=low_stock" class="text-white/90 hover:text-white transition-colors">
                     <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
@@ -297,10 +297,10 @@
                     <i class="fas fa-warehouse mr-1"></i> <?php echo htmlspecialchars($item['location_name']); ?>
                 </p>
                 <p class="text-xs text-gray-500">
-                    Min: <?php echo $item['min_quantity']; ?> units
+                    Min: <?php echo $item['low_stock_threshold']; ?> units
                 </p>
                 <div class="mt-3 flex justify-end">
-                    <a href="<?php echo APP_URL; ?>/stock/add?product_id=<?php echo $item['product_id']; ?>" 
+                    <a href="<?php echo APP_URL; ?>/stock/add?product_id=<?php echo $item['product_id']; ?>&location_id=<?php echo $item['location_id']; ?>&size_id=<?php echo $item['size_id']; ?>" 
                        class="text-xs bg-gradient-to-r from-green-500 to-emerald-600 text-white px-3 py-1 rounded-full hover:shadow-md transition-all">
                         <i class="fas fa-plus mr-1"></i> Restock
                     </a>

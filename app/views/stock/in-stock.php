@@ -100,13 +100,23 @@
     <div id="stock-main-content" class="bg-white shadow-lg rounded-xl p-6">
         <div class="flex items-center justify-between">
             <div class="flex items-center">
-                <div class="bg-gradient-to-r from-blue-500 to-cyan-600 p-3 rounded-lg shadow-lg">
-                    <i class="fas fa-warehouse text-white text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <h1 class="text-2xl font-bold text-gray-800">Current Stock Levels</h1>
-                    <p class="text-sm text-gray-600">View inventory across all locations</p>
-                </div>
+                <?php if (isset($filter) && $filter === 'low_stock') : ?>
+                    <div class="bg-gradient-to-r from-yellow-500 to-orange-600 p-3 rounded-lg shadow-lg">
+                        <i class="fas fa-exclamation-triangle text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h1 class="text-2xl font-bold text-gray-800">Low Stock Items</h1>
+                        <p class="text-sm text-gray-600">Items that need to be restocked</p>
+                    </div>
+                <?php else: ?>
+                    <div class="bg-gradient-to-r from-blue-500 to-cyan-600 p-3 rounded-lg shadow-lg">
+                        <i class="fas fa-warehouse text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h1 class="text-2xl font-bold text-gray-800">Current Stock Levels</h1>
+                        <p class="text-sm text-gray-600">View inventory across all locations</p>
+                    </div>
+                <?php endif; ?>
             </div>
             <div class="flex items-center space-x-4">
                 <button id="bulkAddBtn" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">
@@ -138,7 +148,7 @@
         </div>
 
     <div id="stock-content-area" class="space-y-6">
-        <?php include 'partials/stock_content.php'; ?>
+        <?php require 'partials/stock_content.php'; ?>
     </div>
 
 <script>

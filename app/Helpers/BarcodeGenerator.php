@@ -18,12 +18,12 @@ class BarcodeGenerator
     {
         try {
             $generator = new BarcodeGeneratorSVG();
-// Generate Code 128 barcode
+            // Generate Code 128 barcode
             $barcode = $generator->getBarcode($code, $generator::TYPE_CODE_128, $width, $height);
-// Wrap in a container div for better display
+            // Wrap in a container div for better display
             return '<div style="display: inline-block;">' . $barcode . '</div>';
         } catch (Exception $e) {
-        // Fallback to simple text if generation fails
+            // Fallback to simple text if generation fails
             return '<div style="font-family: monospace; font-size: 14px; padding: 10px; background: #f0f0f0; border: 1px solid #ccc;">' .
                    htmlspecialchars($code) . '</div>';
         }
@@ -46,7 +46,7 @@ class BarcodeGenerator
                 ->build();
             return $result->getString();
         } catch (Exception $e) {
-        // Fallback if QR generation fails
+            // Fallback if QR generation fails
             return '<div style="width: ' . $size . 'px; height: ' . $size . 'px; display: flex; align-items: center; justify-content: center; border: 2px dashed #ccc; background: #f9f9f9;">' .
                    '<div style="text-align: center; color: #666;">' .
                    '<div style="font-size: 48px;">⚠</div>' .

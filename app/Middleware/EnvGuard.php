@@ -45,8 +45,9 @@ class EnvGuard
 
     /**
      * Generate a signed URL with expiration
-     * @param string $path The path to sign
-     * @param int $ttl Time to live in seconds (default 5 minutes)
+     *
+     * @param  string $path The path to sign
+     * @param  int    $ttl  Time to live in seconds (default 5 minutes)
      * @return string The signed URL
      */
     public static function signUrl(string $path, int $ttl = 300): string
@@ -59,9 +60,10 @@ class EnvGuard
 
     /**
      * Verify a signed URL
-     * @param string $path The path to verify
-     * @param int $exp The expiration timestamp
-     * @param string $sig The signature to verify
+     *
+     * @param  string $path The path to verify
+     * @param  int    $exp  The expiration timestamp
+     * @param  string $sig  The signature to verify
      * @return bool True if valid, false otherwise
      */
     public static function verifySignature(string $path, int $exp, string $sig): bool

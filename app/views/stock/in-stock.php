@@ -134,12 +134,14 @@
     <div class="bg-white shadow-xl rounded-xl overflow-hidden">
         <div class="bg-gradient-to-r from-indigo-50 to-purple-50">
             <nav class="flex space-x-2 p-2" aria-label="Tabs">
-                <a href="<?php echo APP_URL; ?>/stock/in-stock" 
+$filter_param = (isset($filter) && $filter === 'low_stock') ? '&filter=low_stock' : '';
+                ?>
+                <a href="<?php echo APP_URL; ?>/stock/in-stock?<?php echo http_build_query(array_merge($_GET, ['location' => null])); ?><?php echo $filter_param; ?>" 
                    class="<?php echo !$selected_location ? 'bg-white shadow-md text-gray-800' : 'text-gray-600 hover:bg-gray-100'; ?> px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 flex items-center">
                     <i class="fas fa-globe-americas mr-2"></i> All Locations
                 </a>
                 <?php foreach ($locations as $location) : ?>
-                <a href="<?php echo APP_URL; ?>/stock/in-stock?location=<?php echo $location['id']; ?>" 
+                <a href="<?php echo APP_URL; ?>/stock/in-stock?location=<?php echo $location['id']; ?><?php echo $filter_param; ?>" 
                    class="<?php echo $selected_location == $location['id'] ? 'bg-white shadow-md text-gray-800' : 'text-gray-600 hover:bg-gray-100'; ?> px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 flex items-center">
                     <i class="fas fa-map-marker-alt mr-1"></i> <?php echo htmlspecialchars($location['name']); ?>
                 </a>

@@ -501,7 +501,7 @@ function printCodes() {
     const printWindow = window.open('', '_blank', 'width=800,height=600');
     const productInfo = {
         partNumber: '<?php echo addslashes($product['part_number']); ?>',
-        partType: '<?php echo addslashes($product['product_type']); ?>',
+        partType: '<?php echo addslashes($product['product_type'] ?? ''); ?>',
         category: '<?php echo addslashes($product['category_name'] ?? 'N/A'); ?>',
         totalStock: '<?php echo $product['total_stock'] ?? 0; ?>'
     };

@@ -28,6 +28,8 @@ class NotificationHelper
         $sql = "SELECT 
                     i.id,
                     i.product_id,
+                    i.location_id,
+                    i.size_id,
                     i.quantity,
                     p.part_number,
                     p.product_type,
@@ -62,6 +64,7 @@ class NotificationHelper
      */
     private function createInventoryAlert($item)
     {
+        /*
         // Check if a notification for this specific item already exists and is unread
         $checkSql = "SELECT id FROM notifications 
                      WHERE product_id = :product_id 
@@ -81,6 +84,7 @@ class NotificationHelper
         if ($checkStmt->fetch()) {
             return; // Don't create a duplicate unread notification
         }
+        */
 
         $productName = $item['product_type'] ?: $item['part_number'];
         $size = $item['size'] ? " ({$item['size']})" : '';
@@ -113,10 +117,7 @@ class NotificationHelper
                 $this->notificationModel->addNotification(
                     $user['id'],
                     $message,
-                    $type,
-                    $item['product_id'],
-                    $item['location_id'],
-                    $item['size_id']
+                    $type
                 );
             }
         }
@@ -188,7 +189,7 @@ class NotificationHelper
         $users = $stmt->fetchAll();
 
         foreach ($users as $user) {
-            $this->notificationModel->addNotification($user['id'], $message, $type, null, null, null);
+            $this->notificationModel->addNotification($user['id'], $message, $type);
         }
     }
 
@@ -197,7 +198,7 @@ class NotificationHelper
      */
     public function notifyUser($userId, $message, $type = 'system')
     {
-        $this->notificationModel->addNotification($userId, $message, $type, null, null, null);
+        $this->notificationModel->addNotification($userId, $message, $type);
     }
 
     /**
@@ -211,7 +212,7 @@ class NotificationHelper
         $users = $stmt->fetchAll();
 
         foreach ($users as $user) {
-            $this->notificationModel->addNotification($user['id'], $message, $type, null, null, null);
+            $this->notificationModel->addNotification($user['id'], $message, $type);
         }
     }
 }

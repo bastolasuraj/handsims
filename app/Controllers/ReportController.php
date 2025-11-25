@@ -93,6 +93,17 @@ class ReportController extends Controller
     {
         $transactionModel = $this->model('TransactionModel');
         $data = $transactionModel->getTransactionHistory($filters);
+
+        foreach ($data as &$row) {
+            if (isset($row['transaction_type'])) {
+                if ($row['transaction_type'] === 'IN') {
+                    $row['quantity'] = '+' . $row['quantity'];
+                } elseif ($row['transaction_type'] === 'OUT') {
+                    $row['quantity'] = '-' . $row['quantity'];
+                }
+            }
+        }
+
         $this->addLog("Report generated", "Type: Transaction Report");
         return $data;
     }

@@ -461,7 +461,9 @@ class StockController extends Controller
                     ]
                 );
             } catch (\Exception $e) {
-                $db->rollBack();
+                if ($db->inTransaction()) {
+                    $db->rollBack();
+                }
                 $_SESSION['error'] = 'Transfer failed: ' . $e->getMessage();
                 return $this->redirect('/stock/transfer');
             }
@@ -741,7 +743,9 @@ class StockController extends Controller
 
             $this->db->commit();
             $_SESSION['success'] = "Bulk stock import finished. {$successCount} records imported successfully.";
-        } catch (\Exception $e) {            $this->db->rollBack();
+        } catch (\Exception $e) {            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
             $message = "Bulk import failed. " . $e->getMessage();
             if ($errorCount > 0) {
                 $_SESSION['error'] = $message . " {$errorCount} rows failed. Errors: " . implode('; ', $errors);

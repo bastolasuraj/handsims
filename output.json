@@ -1,0 +1,14 @@
+```json
+{
+  "status": "success",
+  "summary": "Fixed a bug where AJAX requests from `master-data-ajax.js` were not properly passing the CSRF token, leading to validation failures. All master data AJAX operations now correctly include the CSRF token.",
+  "changes_made": [
+    {
+      "file": "public/js/master-data-ajax.js",
+      "description": "Modified the `generateItemHtml` function to include a hidden CSRF token input field within all dynamically generated delete forms. Updated the main add/edit form submission logic to unconditionally set the CSRF token in the FormData object."
+    }
+  ],
+  "verification": "PHPUnit tests ran successfully with no errors, indicating no PHP-side regressions were introduced. Frontend JavaScript functionality for CSRF token handling should now be correct.",
+  "commit_hash": "aeef925"
+}
+```

@@ -18,31 +18,11 @@ class DashboardController extends Controller
         $logModel = $this->model('LogModel');
         $notificationModel = $this->model('NotificationModel');
 
-        // Fetch low stock items once to avoid multiple queries
-        $lowStockItems = $inventoryModel->getLowStockItemsDetailed();
-
-        // Low stock notification logic
-        if (in_array($_SESSION['role'], ['admin', 'manager'])) {
-            $lastCheck = $_SESSION['last_low_stock_check'] ?? 0;
-            $checkInterval = 3600; // 1 hour
-
-            if (time() - $lastCheck > $checkInterval) {
-                foreach ($lowStockItems as $item) {
-                    $message = "Low stock alert: " . htmlspecialchars($item['product_type']) .
-                               " (Part No: " . htmlspecialchars($item['part_number']) . ") is running low at " .
-                               htmlspecialchars($item['location_name']) . ". Current quantity: " . $item['quantity'];
-                    $notificationModel->addNotification($_SESSION['user_id'], $message, 'inventory');
-                }
-                $_SESSION['last_low_stock_check'] = time();
-            }
-        }
-
         $this->notifications = $notificationModel->getUnreadNotifications($_SESSION['user_id']);
 
         // Get dashboard statistics
         $data = [
             'total_products' => $productModel->count(),
-            'low_stock_items' => $lowStockItems,
             'recent_transactions' => $transactionModel->getTransactionHistory(['limit' => 10]),
             'recent_logs' => $logModel->getLogs(5),
             'stock_by_location' => $this->getStockByLocation($inventoryModel)
@@ -241,7 +221,7 @@ class DashboardController extends Controller
         $data = [
             'total_products' => $productModel->count(),
             'total_inventory' => $inventoryModel->getTotalStockQuantity(), // Assuming this method exists
-            'low_stock_items' => count($inventoryModel->getLowStockItemsDetailed()),
+
             'todays_transactions' => $transactionModel->getTodaysTransactionCount() // Assuming this method exists
         ];
 

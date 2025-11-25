@@ -270,54 +270,6 @@
         </div>
     </div>
 
-    <!-- Low Stock Alert Section -->
-    <?php if (count($low_stock_items) > 0) : ?>
-    <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl shadow-xl p-6 border-2 border-red-200 slide-up" style="animation-delay: 0.7s">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-bold text-gray-800 flex items-center">
-                <div class="bg-gradient-to-r from-red-500 to-orange-600 p-2 rounded-lg mr-3 animate-pulse">
-                    <i class="fas fa-exclamation-triangle text-white"></i>
-                </div>
-                Low Stock Alert
-            </h2>
-            <span class="bg-red-100 text-red-800 text-xs font-semibold px-3 py-1 rounded-full">
-                <?php echo count($low_stock_items); ?> items need attention
-            </span>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <?php foreach (array_slice($low_stock_items, 0, 6) as $item) : ?>
-            <div class="bg-white rounded-lg p-4 border border-red-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                <div class="flex items-center justify-between mb-2">
-                    <h4 class="font-semibold text-gray-800 text-sm"><?php echo htmlspecialchars($item['part_number']); ?></h4>
-                    <span class="bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded">
-                        <?php echo $item['quantity']; ?> left
-                    </span>
-                </div>
-                <p class="text-xs text-gray-600 mb-1">
-                    <i class="fas fa-warehouse mr-1"></i> <?php echo htmlspecialchars($item['location_name']); ?>
-                </p>
-                <p class="text-xs text-gray-500">
-                    Min: <?php echo $item['low_stock_threshold']; ?> units
-                </p>
-                <div class="mt-3 flex justify-end">
-                    <a href="<?php echo APP_URL; ?>/stock/add?product_id=<?php echo $item['product_id']; ?>&location_id=<?php echo $item['location_id']; ?>&size_id=<?php echo $item['size_id']; ?>" 
-                       class="text-xs bg-gradient-to-r from-green-500 to-emerald-600 text-white px-3 py-1 rounded-full hover:shadow-md transition-all">
-                        <i class="fas fa-plus mr-1"></i> Restock
-                    </a>
-                </div>
-            </div>
-            <?php endforeach; ?>
-        </div>
-        <?php if (count($low_stock_items) > 6) : ?>
-        <div class="mt-4 text-center">
-            <a href="<?php echo APP_URL; ?>/reports/generate?report_type=low_stock&format=csv" 
-               class="text-sm font-medium text-red-600 hover:text-red-700">
-                View all <?php echo count($low_stock_items); ?> low stock items <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
-        <?php endif; ?>
-    </div>
-    <?php endif; ?>
 </div>
 
 <style>

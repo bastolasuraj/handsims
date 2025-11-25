@@ -216,10 +216,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(this);
         // Ensure action is correctly set, even if it was changed by editItem
         formData.set('action', formActionInput.value);
-        // Ensure CSRF token is included
-        if (!formData.has('csrf')) {
-            formData.set('csrf', getCSRFToken());
-        }
+        // Always ensure CSRF token is included
+        formData.set('csrf', getCSRFToken());
 
         try {
             const response = await fetch('', {
@@ -353,6 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <form method="POST" onsubmit="return confirm('Delete this category?')" class="inline delete-form">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="id" value="${item.id}">
+                                <input type="hidden" name="csrf" value="${getCSRFToken()}">
                                 <button type="submit" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded transition-all" title="Delete">
                                     <i class="fas fa-trash text-xs"></i>
                                 </button>
@@ -377,6 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <form method="POST" onsubmit="return confirm('Delete this type?')" class="inline delete-form">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="id" value="${item.id}">
+                                <input type="hidden" name="csrf" value="${getCSRFToken()}">
                                 <button type="submit" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded transition-all" title="Delete">
                                     <i class="fas fa-trash text-xs"></i>
                                 </button>
@@ -399,6 +399,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <form method="POST" onsubmit="return confirm('Delete this size?')" class="inline delete-form">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="id" value="${item.id}">
+                                <input type="hidden" name="csrf" value="${getCSRFToken()}">
                                 <button type="submit" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded transition-all" title="Delete">
                                     <i class="fas fa-trash text-xs"></i>
                                 </button>
@@ -422,6 +423,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <form method="POST" onsubmit="return confirm('Delete this department?')" class="inline delete-form">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="id" value="${item.id}">
+                                <input type="hidden" name="csrf" value="${getCSRFToken()}">
                                 <button type="submit" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded transition-all" title="Delete">
                                     <i class="fas fa-trash text-xs"></i>
                                 </button>
@@ -445,6 +447,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <form method="POST" class="inline delete-form">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="id" value="${item.id}">
+                                <input type="hidden" name="csrf" value="${getCSRFToken()}">
                                 <button type="submit" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded transition-all" title="Delete">
                                     <i class="fas fa-trash text-xs"></i>
                                 </button>
@@ -471,6 +474,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <form method="POST" onsubmit="return confirm('Delete this seller?')" class="inline delete-form">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="id" value="${item.id}">
+                                <input type="hidden" name="csrf" value="${getCSRFToken()}">
                                 <button type="submit" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded transition-all" title="Delete">
                                     <i class="fas fa-trash text-xs"></i>
                                 </button>

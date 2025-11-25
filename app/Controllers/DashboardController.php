@@ -18,11 +18,15 @@ class DashboardController extends Controller
         $logModel = $this->model('LogModel');
         $notificationModel = $this->model('NotificationModel');
 
+        // Fetch low stock items once to avoid multiple queries
+        $lowStockItems = $inventoryModel->getLowStockItemsDetailed();
+
         $this->notifications = $notificationModel->getUnreadNotifications($_SESSION['user_id']);
 
         // Get dashboard statistics
         $data = [
             'total_products' => $productModel->count(),
+            'low_stock_items' => $lowStockItems,
             'recent_transactions' => $transactionModel->getTransactionHistory(['limit' => 10]),
             'recent_logs' => $logModel->getLogs(5),
             'stock_by_location' => $this->getStockByLocation($inventoryModel)
@@ -221,6 +225,7 @@ class DashboardController extends Controller
         $data = [
             'total_products' => $productModel->count(),
             'total_inventory' => $inventoryModel->getTotalStockQuantity(), // Assuming this method exists
+            'low_stock_items' => count($inventoryModel->getLowStockItemsDetailed()),
 
             'todays_transactions' => $transactionModel->getTodaysTransactionCount() // Assuming this method exists
         ];

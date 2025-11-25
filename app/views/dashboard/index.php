@@ -101,22 +101,7 @@
             </div>
         </div>
 
-        <!-- Low Stock Alert -->
-        <div class="stat-card bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl shadow-xl p-6 text-white slide-up" style="animation-delay: 0.2s">
-            <div class="flex items-center justify-between mb-4">
-                <div class="bg-white/20 p-3 rounded-lg animate-pulse">
-                    <i class="fas fa-exclamation-triangle text-2xl"></i>
-                </div>
-                <span class="text-3xl font-bold"><?php echo count($low_stock_items); ?></span>
-            </div>
-            <h3 class="font-semibold mb-1">Low Stock Items</h3>
-            <div class="flex items-center justify-between">
-                <span class="text-xs text-white/70">Need attention</span>
-                <a href="<?php echo APP_URL; ?>/stock/in-stock?filter=low_stock" class="text-white/90 hover:text-white transition-colors">
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-        </div>
+
 
         <!-- Active Locations -->
         <div class="stat-card bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-xl p-6 text-white slide-up" style="animation-delay: 0.3s">

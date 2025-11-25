@@ -8,15 +8,18 @@ class NotificationModel extends Model
 {
     protected $table = 'notifications';
 
-    public function addNotification($userId, $message, $type = 'activity')
+    public function addNotification($userId, $message, $type = 'activity', $productId = null, $locationId = null, $sizeId = null)
     {
-        $sql = "INSERT INTO notifications (user_id, message, type) VALUES (:user_id, :message, :type)";
+        $sql = "INSERT INTO notifications (user_id, message, type, product_id, location_id, size_id) VALUES (:user_id, :message, :type, :product_id, :location_id, :size_id)";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute(
             [
             'user_id' => $userId,
             'message' => $message,
-            'type' => $type
+            'type' => $type,
+            'product_id' => $productId,
+            'location_id' => $locationId,
+            'size_id' => $sizeId
             ]
         );
     }

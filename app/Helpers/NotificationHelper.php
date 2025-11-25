@@ -62,49 +62,62 @@ class NotificationHelper
      */
     private function createInventoryAlert($item)
     {
+        // Check if a notification for this specific item already exists and is unread
+        $checkSql = "SELECT id FROM notifications 
+                     WHERE product_id = :product_id 
+                     AND location_id = :location_id 
+                     AND size_id <=> :size_id 
+                     AND is_read = 0
+                     AND type = 'inventory'
+                     LIMIT 1";
+        
+        $checkStmt = $this->db->prepare($checkSql);
+        $checkStmt->execute([
+            'product_id' => $item['product_id'],
+            'location_id' => $item['location_id'],
+            'size_id' => $item['size_id']
+        ]);
+
+        if ($checkStmt->fetch()) {
+            return; // Don't create a duplicate unread notification
+        }
+
         $productName = $item['product_type'] ?: $item['part_number'];
         $size = $item['size'] ? " ({$item['size']})" : '';
         $location = $item['location_name'];
         $quantity = $item['quantity'];
         $minQty = $item['low_stock_threshold'];
-
-        // Check if notification already exists for this item (within last 24 hours)
-        $checkSql = "SELECT id FROM notifications 
-                     WHERE message LIKE :pattern 
-                     AND created_at > DATE_SUB(NOW(), INTERVAL 24 HOUR)
-                     AND is_read = 0
-                     LIMIT 1";
-        $checkStmt = $this->db->prepare($checkSql);
-        $checkStmt->execute(['pattern' => "%{$productName}%{$location}%"]);
-
-        if ($checkStmt->fetch()) {
-            return; // Don't create duplicate notification
-        }
-
         $message = '';
         $type = 'inventory';
 
         switch ($item['stock_status']) {
-        case 'out_of_stock':
-            $message = "⚠️ OUT OF STOCK: {$productName}{$size} at {$location}. Restock immediately!";
-            break;
-        case 'critical':
-            $message = "🔴 CRITICAL: Only {$quantity} units of {$productName}{$size} left at {$location} (Min: {$minQty})";
-            break;
-        case 'low':
-            $message = "🟡 LOW STOCK: {$productName}{$size} at {$location} has {$quantity} units (Min: {$minQty})";
-            break;
+            case 'out_of_stock':
+                $message = "⚠️ OUT OF STOCK: {$productName}{$size} at {$location}. Restock immediately!";
+                break;
+            case 'critical':
+                $message = "🔴 CRITICAL: Only {$quantity} units of {$productName}{$size} left at {$location} (Min: {$minQty})";
+                break;
+            case 'low':
+                $message = "🟡 LOW STOCK: {$productName}{$size} at {$location} has {$quantity} units (Min: {$minQty})";
+                break;
         }
 
         if ($message) {
-            // Notify all users
-            $usersSql = "SELECT id FROM users WHERE is_active = 1";
+            // Notify all admin and manager users
+            $usersSql = "SELECT id FROM users WHERE is_active = 1 AND role IN ('admin', 'manager')";
             $usersStmt = $this->db->prepare($usersSql);
             $usersStmt->execute();
             $users = $usersStmt->fetchAll();
 
             foreach ($users as $user) {
-                $this->notificationModel->addNotification($user['id'], $message, $type);
+                $this->notificationModel->addNotification(
+                    $user['id'],
+                    $message,
+                    $type,
+                    $item['product_id'],
+                    $item['location_id'],
+                    $item['size_id']
+                );
             }
         }
     }
@@ -175,7 +188,7 @@ class NotificationHelper
         $users = $stmt->fetchAll();
 
         foreach ($users as $user) {
-            $this->notificationModel->addNotification($user['id'], $message, $type);
+            $this->notificationModel->addNotification($user['id'], $message, $type, null, null, null);
         }
     }
 
@@ -184,7 +197,7 @@ class NotificationHelper
      */
     public function notifyUser($userId, $message, $type = 'system')
     {
-        $this->notificationModel->addNotification($userId, $message, $type);
+        $this->notificationModel->addNotification($userId, $message, $type, null, null, null);
     }
 
     /**
@@ -198,7 +211,7 @@ class NotificationHelper
         $users = $stmt->fetchAll();
 
         foreach ($users as $user) {
-            $this->notificationModel->addNotification($user['id'], $message, $type);
+            $this->notificationModel->addNotification($user['id'], $message, $type, null, null, null);
         }
     }
 }
